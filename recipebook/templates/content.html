@@ -1,0 +1,12 @@
+<h1>Recipe Details</h1>
+<ul>
+  {%for item in recipes%}
+  <li><b>Description: </b>{{ item.description }}</li>
+  <li><b>Time required: </b>{{ item.time_required }}</li>
+  <li><b>Instructions: </b>{{ item.instructions }}</li>
+  <li>
+    <b>Chef's Name: </b><a href="/author/{{ item.pk }}">{{ item.author }}</a>
+    {%endfor%}
+  </li>
+  <br />
+</ul>

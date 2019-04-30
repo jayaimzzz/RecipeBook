@@ -1,0 +1,7 @@
+<h1>Recy-pees</h1>
+{% for item in data %}
+<ul>
+  Recipe:
+  <a href="content/{{ item.id }}">{{ item.title }}</a>
+</ul>
+{% endfor %}
