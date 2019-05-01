@@ -1,8 +1,14 @@
 <h1>The Chef's a la de-tails</h1>
 <ul>
-  <li>Name: {{ data.name }}</li>
-  <li>Bio: {{ data.author_bio }}</li>
-  {% for item in recipes %}
-  <li>Other recipes this chef has made: {{ item.title }}</li>
-  {% endfor %}
+  {% for t in data %}
+  <li>Name: {{ t.name }}</li>
+  <li>Bio: {{ t.author_bio }}</li>
+  {%endfor%}
+</ul>
+<h4>Other recipes this chef has made:</h4>
+<ul>
+  <li>
+    {% for item in recipes %}
+    {{ item.title }}, {% endfor %}
+  </li>
 </ul>
