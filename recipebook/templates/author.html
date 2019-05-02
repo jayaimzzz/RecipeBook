@@ -9,6 +9,7 @@
 <ul>
   <li>
     {% for item in recipes %}
-    {{ item.title }}, {% endfor %}
+    <a href="/content/{{ item.id }}">{{ item.title }}</a
+    >, {% endfor %}
   </li>
 </ul>

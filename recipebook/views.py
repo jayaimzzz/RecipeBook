@@ -1,6 +1,7 @@
 from django.shortcuts import render
 
 from .models import Author, Recipe
+from recipebook.forms import AddRecipeForm
 
 
 def index(request):
@@ -22,3 +23,25 @@ def author(request, id):
         "recipes": Recipe.objects.filter(author_id=id),
     }
     return render(request, html, items)
+
+
+def recipeadd(request):
+    html = "recipeadd.html"
+    form = None
+    if request.method == "POST":
+        form = AddRecipeForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            Recipe.objects.create(
+                title=data["title"],
+                author=data["author"],
+                description=data["description"],
+                time_required=data["time_required"],
+                instructions=data["instructions"],
+            )
+            return render(request, "thanks.html")
+    else:
+        form = AddRecipeForm()
+
+    return render(request, html, {"form": form})
+
