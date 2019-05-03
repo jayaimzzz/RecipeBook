@@ -9,3 +9,8 @@ class AddRecipeForm(forms.Form):
     time_required = forms.CharField(max_length=15)
     instructions = forms.CharField(widget=forms.Textarea)
 
+
+class AddAuthorForm(forms.Form):
+    name = forms.CharField(max_length=50)
+    author_bio = forms.CharField(widget=forms.Textarea)
+    user = forms.CharField(max_length=150)
