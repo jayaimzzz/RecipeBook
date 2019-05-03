@@ -5,7 +5,8 @@
   <li><b>Time required: </b>{{ item.time_required }}</li>
   <li><b>Instructions: </b>{{ item.instructions }}</li>
   <li>
-    <b>Chef's Name: </b><a href="/author/{{ item.pk }}">{{ item.author }}</a>
+    <b>Chef's Name: </b
+    ><a href="/author/{{ item.author.id }}">{{ item.author }}</a>
     {%endfor%}
   </li>
   <br />
