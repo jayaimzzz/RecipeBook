@@ -4,4 +4,19 @@
   Recipe:
   <a href="content/{{ item.id }}">{{ item.title }}</a>
 </ul>
-{% endfor %}
+{% endfor %} {% if request.user.author %}
+<a href="logout/">Logout</a>
+<br />
+<br />
+<a href="recipeadd/">Add Recipe</a>
+<br />
+<br />
+{% else %}
+<a href="signup/">Sign Up!</a>
+<br />
+<br />
+<a href="login/">Login</a>
+<br />
+<br />
+<a href="recipeadd/">Add Recipe</a>
+{% endif%}

@@ -1,8 +1,13 @@
 from django.shortcuts import render
 
 from .models import Author, Recipe
-from recipebook.forms import AddRecipeForm, AddAuthorForm
+from recipebook.forms import AddRecipeForm, AddAuthorForm, SignupForm, LoginForm
+
 from django.contrib.auth.models import User
+from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import reverse
+from django.http import HttpResponseRedirect
 
 
 def index(request):
@@ -26,6 +31,7 @@ def author(request, id):
     return render(request, html, items)
 
 
+@login_required()
 def recipeadd(request):
     html = "recipeadd.html"
     form = None
@@ -35,7 +41,8 @@ def recipeadd(request):
             data = form.cleaned_data
             Recipe.objects.create(
                 title=data["title"],
-                author=data["author"],
+                # request.user.author will be user's name that has been authenticated
+                author=request.user.author,
                 description=data["description"],
                 time_required=data["time_required"],
                 instructions=data["instructions"],
@@ -65,3 +72,49 @@ def authoradd(request):
 
     return render(request, html, {"form": form})
 
+
+def signup(request):
+    html = "form.html"
+    form = None
+    if request.method == "POST":
+        form = SignupForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            user = User.objects.create_user(
+                # Will go to the user model
+                username=data["username"],
+                email=data["email"],
+                password=data["password"],
+                # Now I can just do a request.user to get the current user that's logged in
+            )
+            login(request, user)
+            # Author model
+            Author.objects.create(name=data["name"], user=user)
+            return HttpResponseRedirect(reverse("homepage"))
+    else:
+        form = SignupForm()
+    return render(request, html, {"form": form})
+
+
+def login_view(request):
+    html = "form.html"
+    form = None
+    if request.method == "POST":
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            # authenticate returns true or false based on password, so we don't have to deal with hashing or handling the password
+            # also returns instance of that user that just authenticated
+            user = authenticate(username=data["username"], password=data["password"])
+            if user is not None:
+                login(request, user)
+                # GET next drives the redirect when trying to login
+                return HttpResponseRedirect(request.GET.get("next", "/"))
+    else:
+        form = LoginForm()
+    return render(request, html, {"form": form})
+
+
+def logout_view(request):
+    logout(request)
+    return HttpResponseRedirect(reverse("homepage"))
