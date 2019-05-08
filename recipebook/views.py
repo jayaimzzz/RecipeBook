@@ -6,6 +6,7 @@ from recipebook.forms import AddRecipeForm, AddAuthorForm, SignupForm, LoginForm
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import reverse
 from django.http import HttpResponseRedirect
 
@@ -54,21 +55,25 @@ def recipeadd(request):
     return render(request, html, {"form": form})
 
 
+@staff_member_required()
 def authoradd(request):
     html = "authoradd.html"
     form = None
-    if request.method == "POST":
-        form = AddAuthorForm(request.POST)
-        if form.is_valid():
-            data = form.cleaned_data
-            Author.objects.create(
-                name=data["name"],
-                author_bio=data["author_bio"],
-                user=User.objects.create_user(data["user"]),
-            )
-            return render(request, "thanks.html")
+    if request.user:
+        if request.method == "POST":
+            form = AddAuthorForm(request.POST)
+            if form.is_valid():
+                data = form.cleaned_data
+                Author.objects.create(
+                    name=data["name"],
+                    author_bio=data["author_bio"],
+                    user=User.objects.create_user(data["user"]),
+                )
+                return render(request, "thanks.html")
+        else:
+            form = AddAuthorForm()
     else:
-        form = AddAuthorForm()
+        login_view(request)
 
     return render(request, html, {"form": form})
 
@@ -85,7 +90,6 @@ def signup(request):
                 username=data["username"],
                 email=data["email"],
                 password=data["password"],
-                # Now I can just do a request.user to get the current user that's logged in
             )
             login(request, user)
             # Author model
