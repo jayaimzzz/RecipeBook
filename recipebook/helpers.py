@@ -11,3 +11,10 @@ def can_user_edit_recipe(request, recipe):
     if request.user.is_staff:
         result = True
     return result
+
+def get_user(request):
+    if hasattr(request.user, 'author'):
+        return Author.objects.filter(id=request.user.author.id).first()
+    else:
+        return None
+    

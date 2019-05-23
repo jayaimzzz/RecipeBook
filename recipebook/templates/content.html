@@ -14,6 +14,11 @@
     <button type="submit">edit recipe</button>
   </form>
   {% endif %}
+  {% if is_logged_in %}
+  <form action="/favorite/{{recipes.0.id}}">
+    <button type="submit">{{ fav_unfav }}</button>
+  </form>
+  {% endif %}
   <br />
 </ul>
 <br />

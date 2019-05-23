@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 
 from .models import Author, Recipe
 from recipebook.forms import AddRecipeForm, AddAuthorForm, SignupForm, LoginForm
-from recipebook.helpers import can_user_edit_recipe
+from recipebook.helpers import can_user_edit_recipe, get_user
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
@@ -20,12 +20,30 @@ def index(request):
 def recipe_content(request, id):
     html = "content.html"
     recipes = Recipe.objects.filter(id=id)
+    user = get_user(request)
+    if user and recipes[0] in user.favorites.get_queryset():
+        fav_unfav = "unheart"
+    else:
+        fav_unfav = "heart"
     user_can_edit = can_user_edit_recipe(request, recipes[0])
     recipe_list = {
         "recipes": recipes,
-        "user_can_edit": user_can_edit
+        "user_can_edit": user_can_edit,
+        "fav_unfav": fav_unfav,
+        "is_logged_in": bool(user)
         }
     return render(request, html, recipe_list)
+
+@login_required
+def toggle_favorite_recipe_view(request, recipe_id):
+    user_id = request.user.author.id
+    user = Author.objects.filter(id=user_id).first()
+    recipe = Recipe.objects.filter(id=recipe_id).first()
+    if recipe in user.favorites.get_queryset():
+        user.favorites.remove(recipe)
+    else:
+        user.favorites.add(recipe)
+    return redirect('/content/' + str(recipe_id))
 
 
 def author(request, id):
