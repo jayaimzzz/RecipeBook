@@ -4,11 +4,16 @@
   <li><b>Description: </b>{{ item.description }}</li>
   <li><b>Time required: </b>{{ item.time_required }}</li>
   <li><b>Instructions: </b>{{ item.instructions }}</li>
-  <li>
     <b>Chef's Name: </b
     ><a href="/author/{{ item.author.id }}">{{ item.author }}</a>
     {%endfor%}
   </li>
+  <br>
+  {% if user_can_edit %}
+  <form action="/recipeedit/{{recipes.0.id}}">
+    <button type="submit">edit recipe</button>
+  </form>
+  {% endif %}
   <br />
 </ul>
 <br />

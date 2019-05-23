@@ -1,8 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 from .models import Author, Recipe
 from recipebook.forms import AddRecipeForm, AddAuthorForm, SignupForm, LoginForm
-
+from recipebook.helpers import can_user_edit_recipe
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
@@ -19,7 +19,12 @@ def index(request):
 
 def recipe_content(request, id):
     html = "content.html"
-    recipe_list = {"recipes": Recipe.objects.filter(id=id)}
+    recipes = Recipe.objects.filter(id=id)
+    user_can_edit = can_user_edit_recipe(request, recipes[0])
+    recipe_list = {
+        "recipes": recipes,
+        "user_can_edit": user_can_edit
+        }
     return render(request, html, recipe_list)
 
 
@@ -52,6 +57,37 @@ def recipeadd(request):
     else:
         form = AddRecipeForm()
 
+    return render(request, html, {"form": form})
+
+
+@login_required()
+def recipeedit(request, recipeid):
+    html = "recipeadd.html"
+    form = None
+    recipe = Recipe.objects.filter(id=recipeid)
+    user_can_edit = can_user_edit_recipe(request,recipe[0])
+    if not user_can_edit:
+        return redirect('/') 
+    if request.method == "POST":
+        form = AddRecipeForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            recipe.update(
+                title=data["title"],
+                description=data["description"],
+                time_required=data["time_required"],
+                instructions=data["instructions"]
+            )
+        return render(request, "recipeeditsuccess.html")
+    else:
+        recipe_instance = recipe.first()
+        data = {
+            "title": recipe_instance.title,
+            "description": recipe_instance.description,
+            "time_required": recipe_instance.time_required,
+            "instructions": recipe_instance.instructions,
+        }
+        form = AddRecipeForm(initial=data)
     return render(request, html, {"form": form})
 
 
