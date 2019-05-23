@@ -13,6 +13,14 @@
     >, {% endfor %}
   </li>
 </ul>
+<h4>Chef's favorites:</h4>
+<ul>
+  {% for item in favorites %}
+  <li>
+    <a href="/content/{{ item.id }}">{{ item.title }}</a>
+  </li>
+  {% endfor %}
+</ul>
 <br />
 <br />
 <a href="/">Home</a>

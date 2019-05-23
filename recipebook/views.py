@@ -48,9 +48,12 @@ def toggle_favorite_recipe_view(request, recipe_id):
 
 def author(request, id):
     html = "author.html"
+    author = Author.objects.filter(id=id)
+    favorites = author[0].favorites.get_queryset()
     items = {
-        "data": Author.objects.filter(id=id),
+        "data": author,
         "recipes": Recipe.objects.filter(author_id=id),
+        "favorites": favorites
     }
     return render(request, html, items)
 
